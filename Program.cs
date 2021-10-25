@@ -6,7 +6,13 @@ namespace Завдання_9
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+            Storage storage = new Storage(@"E:\Sigma Pract\Завдання 9\Products.txt");
+
+            storage.PrintProductsInfo();
+
+            Console.ReadKey();
         }
     }
 }

@@ -10,11 +10,21 @@ namespace Завдання_9
         public List<Product> products;
         public int Size { get { return products.Count; } }
 
+        private ProductsCreator productsCreator;
+
         public Storage()
         {
             products = new List<Product>();
+            productsCreator = new ProductsCreator();
             //FillStorageFromConsole();
-            FillStorageByInitialization();
+            FillStorageByInitialization();      
+        }
+
+        public Storage(string filePath)
+        {
+            products = new List<Product>();
+            productsCreator = new ProductsCreator();
+            FillStorageFromFile(filePath);
         }
 
         public Product this[int index]
@@ -114,6 +124,54 @@ namespace Завдання_9
             products.Add(bread);
         }
 
+        private void FillStorageFromFile(string filePath)
+        {
+            #region Перевірки
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                throw new ArgumentException("Шлях до файлу не може бути пустим.", nameof(filePath));
+            }
+
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException("Файлу за вказаним шляхом не знайдено.", nameof(filePath));
+            }
+
+            if (string.Compare(new FileInfo(filePath).Extension, ".txt") != 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(filePath), "Доступно тільки розширення файлу .txt .");
+            }
+            #endregion
+
+            using (StreamReader file = new StreamReader(filePath))
+            {
+                Product product = null;
+                string line;
+
+                while ((line = file.ReadLine()) != null)
+                {
+                    string[] args = line.Split();
+
+                    switch(args[0])
+                    {
+                        case "Product":
+                            product = productsCreator.GetProductFromFile(args);
+                            break;
+                        case "Diary":
+                            product = productsCreator.GetDairyProductFromFile(args);
+                            break;
+                        case "Meat":
+                            product = productsCreator.GetMeatProductFromFile(args);
+                            break;
+                        default:
+                            throw new ArgumentException("Помилка читання типу продукту, перевірте правильність заповнення файлу");
+                    }
+
+                    products.Add(product);
+                }
+            }
+        }
+
         private Product GetNewProductFromConsole()
         {
             Console.Clear();
@@ -127,77 +185,14 @@ namespace Завдання_9
             switch (key.Key)
             {
                 case ConsoleKey.P:
-                    return GetProductFromConsole();
+                    return productsCreator.GetProductFromConsole();
                 case ConsoleKey.M:
-                    return GetMeatProductFromConsole();
+                    return productsCreator.GetMeatProductFromConsole();
                 case ConsoleKey.D:
-                    return GetDairyProductFromConsole();
+                    return productsCreator.GetDairyProductFromConsole();
                 default:
                     return null;
             }
-        }
-
-        private Product GetProductFromConsole()
-        {
-            Console.Clear();
-
-            Console.Write("Введіть назву товару: ");
-            string name = Console.ReadLine();
-            Console.Write("Введіть ціну товару (xx,xx): ");
-            float price = float.Parse(Console.ReadLine());
-            Console.Write("Введіть вагу товару (xx,xx): ");
-            float weigth = float.Parse(Console.ReadLine());
-            Console.Write("Введіть термін придатності (к-сть днів): ");
-            int expirationDate = int.Parse(Console.ReadLine());
-            Console.Write("Введіть дату виготовлення (дд.мм.рррр): ");
-            DateTime manufactureDate = DateTime.ParseExact(Console.ReadLine(), "dd.MM.yyyy", CultureInfo.InvariantCulture);
-
-            Product product = new Product(name, price, weigth, expirationDate, manufactureDate);
-            return product;
-        }
-
-        private Meat GetMeatProductFromConsole()
-        {
-            Console.Clear();
-
-            Console.Write("Виберіть вид м'яса (баранина - 1, телятина - 2, свинина - 3, курятина - 4): ");
-            MeatType meatType = Enum.Parse<MeatType>(Console.ReadLine());
-
-            Console.Write("Виберіть сорт м'яса (вищий - 1, перший - 2, другий - 3): ");
-            MeatGrade meatGrade = Enum.Parse<MeatGrade>(Console.ReadLine());
-
-            Console.Write("Введіть назву товару: ");
-            string name = Console.ReadLine();
-            Console.Write("Введіть ціну товару (xx,xx): ");
-            float price = float.Parse(Console.ReadLine());
-            Console.Write("Введіть вагу товару (xx,xx): ");
-            float weigth = float.Parse(Console.ReadLine());
-            Console.Write("Введіть термін придатності (к-сть днів): ");
-            int expirationDate = int.Parse(Console.ReadLine());
-            Console.Write("Введіть дату виготовлення (дд.мм.рррр): ");
-            DateTime manufactureDate = DateTime.ParseExact(Console.ReadLine(), "dd.MM.yyyy", CultureInfo.InvariantCulture);
-
-            Meat meatProduct = new Meat(name, price, weigth, meatGrade, meatType, expirationDate, manufactureDate);
-            return meatProduct;
-        }
-
-        private Product GetDairyProductFromConsole()
-        {
-            Console.Clear();
-
-            Console.Write("Введіть назву товару: ");
-            string name = Console.ReadLine();
-            Console.Write("Введіть ціну товару (xx,xx): ");
-            float price = float.Parse(Console.ReadLine());
-            Console.Write("Введіть вагу товару (xx,xx): ");
-            float weigth = float.Parse(Console.ReadLine());
-            Console.Write("Введіть термін придатності (к-сть днів): ");
-            int expirationDate = int.Parse(Console.ReadLine());
-            Console.Write("Введіть дату виготовлення (дд.мм.рррр): ");
-            DateTime manufactureDate = DateTime.ParseExact(Console.ReadLine(), "dd.MM.yyyy", CultureInfo.InvariantCulture);
-
-            DairyProduct dairyProduct = new DairyProduct(name, price, weigth, expirationDate, manufactureDate);
-            return dairyProduct;
         }
     }
 }

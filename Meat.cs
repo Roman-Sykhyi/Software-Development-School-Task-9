@@ -46,17 +46,6 @@ namespace Завдання_9
             base.RaisePrice(percent);
         }
 
-        //public override bool Equals(object obj)
-        //{
-        //    Meat product = obj as Meat;
-        //    return product == null ? false : Name.Equals(product.Name);
-        //}
-
-        //public override int GetHashCode()
-        //{
-        //    return base.GetHashCode();
-        //}
-
         public override string ToString()
         {
             string gradeText = string.Empty;
