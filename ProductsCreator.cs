@@ -51,24 +51,47 @@ namespace Завдання_9
             if (!int.TryParse(args[4], out expirationDate))
                 throw new ArgumentException("Помилка читання терміну придатності продукту з файлу, перевірте правильність заповнення файлу");
 
-            if (!DateTime.TryParseExact(args[5], "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out manufactureDate))
+            if (!DateTime.TryParseExact(args[5], "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out manufactureDate))
                 throw new ArgumentException("Помилка читання дати виготовлення продукту з файлу, перевірте правильність заповнення файлу");
         }
         #endregion
 
         #region console
-        public Product GetProductFromConsole()
+        public Product GetNewProductFromConsole()
+        {
+            Console.Clear();
+            Console.WriteLine("Виберіть тип продукту");
+            Console.WriteLine("P - звичайний продукт");
+            Console.WriteLine("M - м'ясний продукт");
+            Console.WriteLine("D - молочний продукт");
+
+            var key = Console.ReadKey();
+
+            switch (key.Key)
+            {
+                case ConsoleKey.P:
+                    return GetProductFromConsole();
+                case ConsoleKey.M:
+                    return GetMeatProductFromConsole();
+                case ConsoleKey.D:
+                    return GetDairyProductFromConsole();
+                default:
+                    return null;
+            }
+        }
+
+        private Product GetProductFromConsole()
         {
             GetDefaultProductAtributesFromConsole();
             return new Product(name, price, weight, expirationDate, manufactureDate); 
         }
 
-        public DairyProduct GetDairyProductFromConsole()
+        private DairyProduct GetDairyProductFromConsole()
         {
             return GetProductFromConsole() as DairyProduct;
         }
 
-        public Meat GetMeatProductFromConsole()
+        private Meat GetMeatProductFromConsole()
         {
             Console.Clear();
 
@@ -89,14 +112,22 @@ namespace Завдання_9
 
             Console.Write("Введіть назву товару: ");
             name = Console.ReadLine();
+
             Console.Write("Введіть ціну товару (xx,xx): ");
-            price = float.Parse(Console.ReadLine());
+            if (!float.TryParse(Console.ReadLine(), out price))
+                throw new ArgumentException("Помилка введення ціни товару", nameof(price));
+
             Console.Write("Введіть вагу товару (xx,xx): ");
-            weight = float.Parse(Console.ReadLine());
+            if (!float.TryParse(Console.ReadLine(), out weight))
+                throw new ArgumentException("Помилка введення ваги товару", nameof(weight));
+
             Console.Write("Введіть термін придатності (к-сть днів): ");
-            expirationDate = int.Parse(Console.ReadLine());
+            if (!int.TryParse(Console.ReadLine(), out expirationDate))
+                throw new ArgumentException("Помилка введення терміну придатності товару", nameof(expirationDate));
+
             Console.Write("Введіть дату виготовлення (дд.мм.рррр): ");
-            manufactureDate = DateTime.ParseExact(Console.ReadLine(), "dd.MM.yyyy", CultureInfo.InvariantCulture);
+            if (!DateTime.TryParseExact(Console.ReadLine(), "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out manufactureDate))
+                throw new ArgumentException("Помилка введення дати виготовлення товару", nameof(manufactureDate));
         }
         #endregion
     }

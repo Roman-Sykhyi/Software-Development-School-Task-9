@@ -7,10 +7,14 @@ namespace Завдання_9
 {
     public class Storage
     {
-        public List<Product> products;
-        public int Size { get { return products.Count; } }
+        public delegate void ProductAddHandler(string s);
+        public event ProductAddHandler IncorrectProductInput;
 
+        public IReadOnlyList<Product> Products => products.AsReadOnly();
+
+        private List<Product> products;
         private ProductsCreator productsCreator;
+        public int Size { get { return products.Count; } }
 
         public Storage()
         {
@@ -59,15 +63,6 @@ namespace Завдання_9
             writer.Close();
         }
 
-        public void PrintProductsInfo()
-        {
-            Console.WriteLine("Інформація про наявні товари:");
-            foreach (Product product in products)
-            {
-                Console.WriteLine(product.ToString());
-            }
-        }
-
         public List<Meat> GetMeatProducts()
         {
             List<Meat> meats = new List<Meat>();
@@ -91,6 +86,31 @@ namespace Завдання_9
             }
         }
 
+        public void AddNewProduct()
+        {
+            Product product = null;
+
+            try
+            {
+                product = productsCreator.GetNewProductFromConsole();
+            } 
+            catch (Exception e)
+            {
+                IncorrectProductInput?.Invoke(e.Message);
+            }
+
+            if (product != null)
+                products.Add(product);
+        }
+
+        public void RemoveProduct(string name)
+        {
+            Product productToRemove = products.Find((p) => p.Name.Equals(name));
+
+            if (productToRemove != null)
+                products.Remove(productToRemove);
+        }
+
         private void FillStorageFromConsole()
         {
             while (true)
@@ -104,7 +124,7 @@ namespace Завдання_9
                 switch (key.Key)
                 {
                     case ConsoleKey.N:
-                        Product product = GetNewProductFromConsole();
+                        Product product = productsCreator.GetNewProductFromConsole();
                         products.Add(product);
                         break;
                     case ConsoleKey.Q:
@@ -169,29 +189,6 @@ namespace Завдання_9
 
                     products.Add(product);
                 }
-            }
-        }
-
-        private Product GetNewProductFromConsole()
-        {
-            Console.Clear();
-            Console.WriteLine("Виберіть тип продукту");
-            Console.WriteLine("P - звичайний продукт");
-            Console.WriteLine("M - м'ясний продукт");
-            Console.WriteLine("D - молочний продукт");
-            
-            var key = Console.ReadKey();
-
-            switch (key.Key)
-            {
-                case ConsoleKey.P:
-                    return productsCreator.GetProductFromConsole();
-                case ConsoleKey.M:
-                    return productsCreator.GetMeatProductFromConsole();
-                case ConsoleKey.D:
-                    return productsCreator.GetDairyProductFromConsole();
-                default:
-                    return null;
             }
         }
     }

@@ -16,7 +16,7 @@ namespace Завдання_9
         public Product(string name, float price, float weight, int expirationDate, DateTime manufactureDate)
         {
             if (string.IsNullOrWhiteSpace(name)) 
-                throw new ArgumentNullException("Назва товару не може бути пустою або null", nameof(name));
+                throw new ArgumentException("Назва товару не може бути пустою або null", nameof(name));
 
             if(price <= 0)
                 throw new ArgumentException("Ціна товару не може бути меншою або рівною нулю", nameof(price));

@@ -8,9 +8,17 @@ namespace Завдання_9
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-            Storage storage = new Storage(@"E:\Sigma Pract\Завдання 9\Products.txt");
+            StorageController storageController = new StorageController(@"E:\Sigma Pract\Завдання 9\Products.txt");
 
-            storage.PrintProductsInfo();
+            storageController.PrintProductsInfo();
+
+            Console.ReadKey();
+
+            storageController.AddNewProductToStorage();
+
+            Console.ReadKey();
+
+            storageController.PrintProductsInfo();
 
             Console.ReadKey();
         }
