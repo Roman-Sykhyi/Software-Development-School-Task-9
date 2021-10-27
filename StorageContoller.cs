@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Завдання_9
@@ -15,16 +16,14 @@ namespace Завдання_9
 
             Storage.IncorrectProductInput += WriteIncorrectProductInputErrorToFile;
             Storage.IncorrectProductInput += SuggestAddNewProduct;
+            Storage.ProductsGetInfo += OnPrintProductsInfo;
         }
 
         public void PrintProductsInfo()
         {
             Console.Clear();
             Console.WriteLine("Інформація про наявні товари:");
-            foreach (Product product in Storage.Products)
-            {
-                Console.WriteLine(product.ToString());
-            }
+            Console.WriteLine(Storage.GetProductsInfo());
         }
 
         public void AddNewProductToStorage()
@@ -81,6 +80,40 @@ namespace Завдання_9
                     case ConsoleKey.N:
                         shoudAddNewProduct = false;
                         return;
+                }
+            }
+        }
+
+        private void OnPrintProductsInfo()
+        {
+            List<Product> outOfDateProducts = Storage.RemoveOutOfDateProducts();
+            WriteOutOfDateProductsToFile(outOfDateProducts);
+        }
+
+        private void WriteOutOfDateProductsToFile(List<Product> outOfDateProducts)
+        {
+            string filePath = @"E:\Sigma Pract\Завдання 9\OutOfDateProducts_log.txt";
+
+            #region Перевірки
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                throw new ArgumentException("Шлях до файлу не може бути пустим.", nameof(filePath));
+            }
+
+
+            if (string.Compare(new FileInfo(filePath).Extension, ".txt") != 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(filePath), "Доступно тільки розширення файлу .txt .");
+            }
+            #endregion
+
+            using (StreamWriter writer = new StreamWriter(filePath))
+            {
+                writer.WriteLine("Список протермінованих продуктів, які було видалено зі складу:");
+
+                foreach (Product product in outOfDateProducts)
+                {
+                    writer.WriteLine(product.ToString());
                 }
             }
         }

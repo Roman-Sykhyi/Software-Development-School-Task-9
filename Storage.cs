@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Text;
 
 namespace Завдання_9
 {
@@ -9,6 +10,9 @@ namespace Завдання_9
     {
         public delegate void ProductAddHandler(string s);
         public event ProductAddHandler IncorrectProductInput;
+
+        public delegate void StorageGetProductsInfoHandler();
+        public event StorageGetProductsInfoHandler ProductsGetInfo;
 
         public IReadOnlyList<Product> Products => products.AsReadOnly();
 
@@ -43,24 +47,36 @@ namespace Завдання_9
             }
         }
 
-        public void RemoveOutOfDateDairyProducts(string path)
+        public string GetProductsInfo()
         {
-            StreamWriter writer = new StreamWriter(path);
+            ProductsGetInfo?.Invoke();
 
-            for(int i = products.Count - 1; i >= 0; i--)
+            StringBuilder sb = new StringBuilder();
+
+            foreach(Product product in products)
             {
-                if (products[i] is DairyProduct)
+                sb.AppendLine(product.ToString());
+            }
+
+            return sb.ToString();
+        }
+
+        public List<Product> RemoveOutOfDateProducts()
+        {
+            List<Product> outOfDateProducts = new List<Product>();
+
+            for (int i = products.Count - 1; i >= 0; i--)
+            {
+                DateTime date = products[i].ManufactureDate;
+                date = date.AddDays(products[i].ExpirationDate);
+                if (date.CompareTo(DateTime.Now) < 0)
                 {
-                    DateTime date = products[i].ManufactureDate;
-                    date = date.AddDays(products[i].ExpirationDate);
-                    if (date.CompareTo(DateTime.Now) < 0)
-                    {
-                        writer.WriteLine(products[i].ToString());
-                        products.RemoveAt(i);
-                    }
+                    outOfDateProducts.Add(products[i]);
+                    products.RemoveAt(i);
                 }
             }
-            writer.Close();
+
+            return outOfDateProducts;
         }
 
         public List<Meat> GetMeatProducts()
