@@ -127,6 +127,31 @@ namespace Завдання_9
                 products.Remove(productToRemove);
         }
 
+        public Product GetProductByName(string name)
+        {
+            return products.Find((p) => p.Name.Equals(name));
+        }
+
+        public List<Product> GetProductsByPrice(float price)
+        {
+            return products.FindAll((p) => p.Price == price);
+        }
+
+        public List<Product> GetProductsByWeight(float weight)
+        {
+            return products.FindAll((p) => p.Price == weight);
+        }
+
+        public List<Product> GetProductsByExpirationDate(int expirationDate)
+        {
+            return products.FindAll((p) => p.ExpirationDate == expirationDate);
+        }
+
+        public List<Product> GetProductsByManufactureDate(DateTime manufactureDate)
+        {
+            return products.FindAll((p) => p.ManufactureDate.Date == manufactureDate.Date);
+        }
+
         private void FillStorageFromConsole()
         {
             while (true)
